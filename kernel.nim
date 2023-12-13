@@ -6,7 +6,7 @@ var
     stack_top {.importc: "__stack_top".}: ptr cchar
 
 type
-    sbiret* {.importc: "sbiret", header: "kernel.h".} = object
+    sbiret* {.importc: "struct sbiret", header: "kernel.h".} = object
         error: clong
         value: clong
 
@@ -34,10 +34,10 @@ struct sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4,
 """.}
 
 proc sbi_call(arg0: clong, arg1: clong, arg2: clong, arg3: clong,
-              arg4: clong, arg5: clong, fid: clong, eid: clong) {.importc, nodecl.}
+              arg4: clong, arg5: clong, fid: clong, eid: clong): sbiret {.importc, nodecl.}
 
 proc putchar(ch: cchar) =
-    sbi_call(cast[clong](ch), 0, 0, 0, 0, 0, 0, 1)
+    discard sbi_call(cast[clong](ch), 0, 0, 0, 0, 0, 0, 1)
 
 proc memset(buf: pointer, c: char, n: csize_t): pointer {.exportc.} =
     var p: ptr uint8 = cast[ptr uint8](buf)
@@ -56,7 +56,7 @@ proc kernel_main() {.exportc.} =
         putchar ch
 
     while true:
-        discard
+        asm "wfi"
 
 proc boot() {.exportc, asmNoStackFrame, codegenDecl: """__attribute__((section(".text.boot"))) $# $#$#""".} =
     asm """
