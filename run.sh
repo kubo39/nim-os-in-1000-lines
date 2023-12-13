@@ -9,6 +9,7 @@ clang \
     -o kernel.elf \
     build/@mkernel.nim.c.o \
     --target=riscv32 \
+    -I./kernel.h \
     -Wl,-Tkernel.ld \
     -Wl,-Map=kernel.map \
     -nostdlib
